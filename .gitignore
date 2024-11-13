@@ -1,0 +1,13 @@
+# Binários gerados
+capital-gains
+
+# Diretório de dependências
+vendor/
+
+# Arquivos temporários
+*.log
+*.tmp
+
+# Configurações locais de IDEs
+.idea/
+.vscode/
