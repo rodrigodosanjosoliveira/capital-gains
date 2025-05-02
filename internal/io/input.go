@@ -3,12 +3,14 @@ package io
 import (
 	"bufio"
 	"encoding/json"
-	"github.com/rodrigodosanjosoliveira/capital-gains/internal/models"
+	"io"
 	"os"
+
+	"github.com/rodrigodosanjosoliveira/capital-gains/internal/models"
 )
 
-func ReadInput() ([]models.Operation, error) {
-	scanner := bufio.NewScanner(os.Stdin)
+func ReadInputFrom(r io.Reader) ([]models.Operation, error) {
+	scanner := bufio.NewScanner(r)
 
 	var input string
 
@@ -27,4 +29,8 @@ func ReadInput() ([]models.Operation, error) {
 	}
 
 	return operations, nil
+}
+
+func ReadInput() ([]models.Operation, error) {
+	return ReadInputFrom(os.Stdin)
 }

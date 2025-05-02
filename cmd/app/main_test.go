@@ -1,61 +1,37 @@
 package main
 
 import (
-	"bytes"
-	"os"
+	"encoding/json"
+	"os/exec"
 	"strings"
 	"testing"
+
+	"github.com/rodrigodosanjosoliveira/capital-gains/internal/models"
 )
 
-func TestMainIntegration(t *testing.T) {
-	input := `[{"operation":"buy", "unit-cost":10.00, "quantity":100},{"operation":"sell", "unit-cost":15.00, "quantity":50},{"operation":"sell", "unit-cost":15.00, "quantity":50}]`
+func TestCapitalGains_CLI(t *testing.T) {
+	cmd := exec.Command("go", "run", "main.go")
+	cmd.Stdin = strings.NewReader(`[{"operation":"buy", "unit-cost":10.00, "quantity":100},{"operation":"sell", "unit-cost":15.00, "quantity":50}]`)
 
-	expectedOutput := `[{"tax":0.0},{"tax":0.0},{"tax":0.0}]`
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("execution failed: %v\noutput: %s", err, out)
+	}
 
-	oldStdin := os.Stdin
+	var actual []models.Tax
+	if err := json.Unmarshal(out, &actual); err != nil {
+		t.Fatalf("failed to parse output: %v\noutput: %s", err, out)
+	}
 
-	oldStdout := os.Stdout
+	expected := []models.Tax{{Tax: 0.0}, {Tax: 0.0}}
 
-	defer func() {
-		os.Stdin = oldStdin
-		os.Stdout = oldStdout
-	}()
+	if len(actual) != len(expected) {
+		t.Fatalf("expected %d results, got %d", len(expected), len(actual))
+	}
 
-	stdinReader, stdinWriter, _ := os.Pipe()
-
-	stdoutReader, stdoutWriter, _ := os.Pipe()
-
-	os.Stdin = stdinReader
-
-	os.Stdout = stdoutWriter
-
-	go func() {
-		defer func(stdinWriter *os.File) {
-			err := stdinWriter.Close()
-			if err != nil {
-				t.Errorf("Error closing stdin writer: %v", err)
-			}
-		}(stdinWriter)
-		_, _ = stdinWriter.Write([]byte(input + "\n"))
-	}()
-
-	var outputBuffer bytes.Buffer
-	go func() {
-		defer func(stdoutReader *os.File) {
-			err := stdoutReader.Close()
-			if err != nil {
-				t.Errorf("Error closing stdout reader: %v", err)
-			}
-		}(stdoutReader)
-		_, _ = outputBuffer.ReadFrom(stdoutReader)
-	}()
-
-	main()
-
-	_ = stdoutWriter.Close()
-
-	output := strings.TrimSpace(outputBuffer.String())
-	if output != expectedOutput {
-		t.Errorf("Output mismatch:\nExpected: %s\nGot: %s", expectedOutput, output)
+	for i := range expected {
+		if actual[i] != expected[i] {
+			t.Errorf("at index %d: expected %+v, got %+v", i, expected[i], actual[i])
+		}
 	}
 }

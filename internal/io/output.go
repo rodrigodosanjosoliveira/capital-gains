@@ -7,7 +7,11 @@ import (
 )
 
 func WriteOutput(taxes []models.Tax) error {
-	output, err := json.Marshal(taxes)
+	return WriteOutputWithEncoder(taxes, json.Marshal)
+}
+
+func WriteOutputWithEncoder(taxes []models.Tax, encode func(v any) ([]byte, error)) error {
+	output, err := encode(taxes)
 	if err != nil {
 		return err
 	}
