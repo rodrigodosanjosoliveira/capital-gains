@@ -6,9 +6,9 @@ O projeto calcula os impostos sobre ganhos de capital com base em operações de
 ## Decisões de Projeto
 ### 1. **Separação de responsabilidades:**
 - A solução foi dividida em pacotes dentro da pasta internal/ para organizar responsabilidades:
-  - `calculator/`: Lógica de cálculo de impostos.
-  - `models/`: Definição das structs que representam operações e impostos.
-  - `io/`: Manipulação de entrada e saída, como leitura do JSON de stdin e escrita no stdout.
+    - `calculator/`: Lógica de cálculo de impostos.
+    - `models/`: Definição das structs que representam operações e impostos.
+    - `io/`: Manipulação de entrada e saída, como leitura do JSON de stdin e escrita no stdout.
 ### 2. **Transparência referencial:**
 - A função `CalculateCapitalGains` foi projetada para ser pura, retornando sempre os mesmos resultados para os mesmos inputs, sem efeitos colaterais.
 ### 3. **Testes abrangentes:**
@@ -17,35 +17,66 @@ O projeto calcula os impostos sobre ganhos de capital com base em operações de
 ### 4. **Transparência referencial:**
 - **Pipeline de dados:** A entrada é lida, transformada em structs Go, processada pelo motor de cálculo e serializada para saída.
 
-## Justificativa para o Uso de Bibliotecas
-O projeto utiliza apenas as bibliotecas padrão do Go para cumprir os requisitos:
-1. `encoding/json`: Para serialização e desserialização de JSON.
-   - Escolhida por ser nativa, eficiente e amplamente usada em projetos Go.
-2. `os` e `bufio`: Para manipulação de entrada e saída padrão.
-   - Adequadas para o fluxo baseado em stdin e stdout.
-3. `testing`: Para testes unitários e de integração.
-   - Parte da biblioteca padrão, evitando a necessidade de dependências externas.
+---
 
-## Instruções para Compilar e Executar o Projeto
+## Como executar
 
-### Pré-requisitos
-- Go 1.20 ou superior
+### 1. Localmente com Go
 
-### Compile o Projeto
-1. **No diretório raiz do projeto, execute:**
+#### Dependências:
+- Go 1.21 ou superior
+- `go.mod` e `go.sum` com dependências resolvidas (`go mod tidy`)
+
+#### Rodando:
+
+**Com JSON via argumento:**
+
 ```bash
-go build -o capital-gains cmd/app/main.go
-```
-2. **Execute o programa:**
-```bash
-echo '[{"operation":"buy", "unit-cost":10.00, "quantity":100},{"operation":"sell", "unit-cost":15.00, "quantity":50},{"operation":"sell", "unit-cost":15.00, "quantity":50}]' | ./capital-gains
-```
-ou utilizando um arquivo de entrada:
-```bash
-./capital-gains < input.txt
+go run ./cmd/app '[{"operation":"buy", "unit-cost":10, "quantity":10000},{"operation":"sell", "unit-cost":25, "quantity":1000}]'
 ```
 
-### Execute os Testes
+**Ou com JSON via entrada padrão (stdin):**
+
 ```bash
-go test ./... -v
+echo '[{"operation":"buy", "unit-cost":10, "quantity":10000},{"operation":"sell", "unit-cost":25, "quantity":1000}]' \
+| go run ./cmd/app
 ```
+
+---
+
+### 2. Usando Docker (imagem pública no Docker Hub)
+
+#### Executar com argumento:
+
+```bash
+docker run --rm devbychoice/ganho-de-capital \
+'[{"operation":"buy", "unit-cost":10, "quantity":10000},{"operation":"sell", "unit-cost":25, "quantity":1000}]'
+```
+
+#### 🚀 Executar com entrada via stdin:
+
+```bash
+echo '[{"operation":"buy", "unit-cost":10, "quantity":10000},{"operation":"sell", "unit-cost":25, "quantity":1000}]' \
+| docker run -i --rm devbychoice/ganho-de-capital
+```
+
+---
+
+## Exemplo de entrada
+
+```json
+[
+  { "operation": "buy",  "unit-cost": 10.00, "quantity": 10000 },
+  { "operation": "sell", "unit-cost": 25.00, "quantity": 1000 }
+]
+```
+
+### Saída esperada
+
+```json
+[
+  { "tax": 0.0 },
+  { "tax": 1000.0 }
+]
+```
+
