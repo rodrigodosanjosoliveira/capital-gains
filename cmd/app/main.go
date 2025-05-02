@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	operations, err := io.ReadInput()
+	operations, err := io.ReadInputFlexible()
 	if err != nil {
 		fmt.Println("Error reading input:", err)
 		return

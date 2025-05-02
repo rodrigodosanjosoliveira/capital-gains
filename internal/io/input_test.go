@@ -1,7 +1,7 @@
 package io
 
 import (
-	"errors"
+	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -9,51 +9,65 @@ import (
 	"github.com/rodrigodosanjosoliveira/capital-gains/internal/models"
 )
 
-func TestReadInputFrom(t *testing.T) {
-	jsonInput := `[{"operation":"buy","unit-cost":10.0,"quantity":100},{"operation":"sell","unit-cost":15.0,"quantity":50}]`
-	reader := strings.NewReader(jsonInput)
+func TestReadInputFlexible_WithArgument(t *testing.T) {
+	originalArgs := os.Args
+	defer func() { os.Args = originalArgs }()
 
-	operations, err := ReadInputFrom(reader)
+	os.Args = []string{"cmd", `[{"operation":"buy","unit-cost":10.0,"quantity":100}]`}
+
+	ops, err := ReadInputFlexible()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	expected := []models.Operation{
-		{Operation: "buy", UnitCost: 10.0, Quantity: 100},
-		{Operation: "sell", UnitCost: 15.0, Quantity: 50},
-	}
+	expected := []models.Operation{{Operation: "buy", UnitCost: 10.0, Quantity: 100}}
 
-	if !reflect.DeepEqual(operations, expected) {
-		t.Errorf("expected %v, got %v", expected, operations)
+	if !reflect.DeepEqual(ops, expected) {
+		t.Errorf("expected %v, got %v", expected, ops)
 	}
 }
 
-type errorReader struct{}
+func TestReadInputFlexible_FromStdin(t *testing.T) {
+	input := `[{"operation":"sell","unit-cost":15.0,"quantity":50}]`
+	r := strings.NewReader(input)
 
-func (e *errorReader) Read(_ []byte) (n int, err error) {
-	return 0, errors.New("simulated read error")
+	// Sem argumentos
+	originalArgs := os.Args
+	defer func() { os.Args = originalArgs }()
+	os.Args = []string{"cmd"}
+
+	ops, err := ReadInputFromReaderOrArg(r)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	expected := []models.Operation{{Operation: "sell", UnitCost: 15.0, Quantity: 50}}
+
+	if !reflect.DeepEqual(ops, expected) {
+		t.Errorf("expected %v, got %v", expected, ops)
+	}
 }
 
-func TestReadInputFrom_Errors(t *testing.T) {
-	t.Run("should return error when reader fails", func(t *testing.T) {
-		_, err := ReadInputFrom(&errorReader{})
-		if err == nil || err.Error() != "simulated read error" {
-			t.Errorf("expected simulated read error, got: %v", err)
-		}
-	})
+func TestReadInputFlexible_InvalidJSON(t *testing.T) {
+	originalArgs := os.Args
+	defer func() { os.Args = originalArgs }()
 
-	t.Run("should return error when JSON is invalid", func(t *testing.T) {
-		invalidJSON := `{"operation":"buy","unit-cost":10.0,"quantity":100}` // não é um array
-		_, err := ReadInputFrom(strings.NewReader(invalidJSON))
-		if err == nil {
-			t.Errorf("expected json unmarshal error, got nil")
-		}
-	})
+	os.Args = []string{"cmd", `{"invalid":"json"}`} // inválido: não é array
 
-	t.Run("should return error when input is empty", func(t *testing.T) {
-		_, err := ReadInputFrom(strings.NewReader(""))
-		if err == nil {
-			t.Errorf("expected error due to empty input, got nil")
-		}
-	})
+	_, err := ReadInputFlexible()
+	if err == nil {
+		t.Error("expected error for invalid JSON, got nil")
+	}
+}
+
+func TestReadInputFlexible_EmptyInput(t *testing.T) {
+	originalArgs := os.Args
+	defer func() { os.Args = originalArgs }()
+
+	os.Args = []string{"cmd", ""}
+
+	_, err := ReadInputFlexible()
+	if err == nil {
+		t.Error("expected error for empty input, got nil")
+	}
 }
