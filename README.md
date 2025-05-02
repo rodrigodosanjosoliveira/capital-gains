@@ -53,7 +53,7 @@ docker run --rm devbychoice/ganho-de-capital \
 '[{"operation":"buy", "unit-cost":10, "quantity":10000},{"operation":"sell", "unit-cost":25, "quantity":1000}]'
 ```
 
-#### 🚀 Executar com entrada via stdin:
+#### Executar com entrada via stdin:
 
 ```bash
 echo '[{"operation":"buy", "unit-cost":10, "quantity":10000},{"operation":"sell", "unit-cost":25, "quantity":1000}]' \
