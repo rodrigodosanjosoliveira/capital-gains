@@ -16,9 +16,9 @@ func TestCalculateCapitalGains(t *testing.T) {
 		{
 			name: "Case #1",
 			operations: []models.Operation{
-				{"buy", 10.00, 100},
-				{"sell", 15.00, 50},
-				{"sell", 15.00, 50},
+				{Operation: "buy", UnitCost: 10.00, Quantity: 100},
+				{Operation: "sell", UnitCost: 15.00, Quantity: 50},
+				{Operation: "sell", UnitCost: 15.00, Quantity: 50},
 			},
 			expected: []models.Tax{
 				{Tax: 0.00}, {Tax: 0.00}, {Tax: 0.00},
@@ -27,9 +27,9 @@ func TestCalculateCapitalGains(t *testing.T) {
 		{
 			name: "Case #2",
 			operations: []models.Operation{
-				{"buy", 10.00, 10000},
-				{"sell", 20.00, 5000},
-				{"sell", 5.00, 5000},
+				{Operation: "buy", UnitCost: 10.00, Quantity: 10000},
+				{Operation: "sell", UnitCost: 20.00, Quantity: 5000},
+				{Operation: "sell", UnitCost: 5.00, Quantity: 5000},
 			},
 			expected: []models.Tax{
 				{Tax: 0.00}, {Tax: 10000.00}, {Tax: 0.00},
@@ -38,12 +38,12 @@ func TestCalculateCapitalGains(t *testing.T) {
 		{
 			name: "Case #1 + Case #2",
 			operations: []models.Operation{
-				{"buy", 10.00, 100},
-				{"sell", 15.00, 50},
-				{"sell", 15.00, 50},
-				{"buy", 10.00, 10000},
-				{"sell", 20.00, 5000},
-				{"sell", 5.00, 5000},
+				{Operation: "buy", UnitCost: 10.00, Quantity: 100},
+				{Operation: "sell", UnitCost: 5.00, Quantity: 50},
+				{Operation: "sell", UnitCost: 15.00, Quantity: 50},
+				{Operation: "buy", UnitCost: 10.00, Quantity: 10000},
+				{Operation: "sell", UnitCost: 20.00, Quantity: 5000},
+				{Operation: "sell", UnitCost: 5.00, Quantity: 5000},
 			},
 			expected: []models.Tax{
 				{Tax: 0.00}, {Tax: 0.00}, {Tax: 0.00},
@@ -53,9 +53,9 @@ func TestCalculateCapitalGains(t *testing.T) {
 		{
 			name: "Case #3",
 			operations: []models.Operation{
-				{"buy", 10.00, 10000},
-				{"sell", 5.00, 5000},
-				{"sell", 20.00, 3000},
+				{Operation: "buy", UnitCost: 10.00, Quantity: 10000},
+				{Operation: "sell", UnitCost: 5.00, Quantity: 000},
+				{Operation: "sell", UnitCost: 20.00, Quantity: 3000},
 			},
 			expected: []models.Tax{
 				{Tax: 0.00}, {Tax: 0.00}, {Tax: 1000.00},
@@ -64,9 +64,9 @@ func TestCalculateCapitalGains(t *testing.T) {
 		{
 			name: "Case #4",
 			operations: []models.Operation{
-				{"buy", 10.00, 10000},
-				{"buy", 25.00, 5000},
-				{"sell", 15.00, 10000},
+				{Operation: "buy", UnitCost: 10.00, Quantity: 10000},
+				{Operation: "buy", UnitCost: 25.00, Quantity: 5000},
+				{Operation: "sell", UnitCost: 15.00, Quantity: 10000},
 			},
 			expected: []models.Tax{
 				{Tax: 0.00}, {Tax: 0.00}, {Tax: 0.00},
@@ -75,10 +75,10 @@ func TestCalculateCapitalGains(t *testing.T) {
 		{
 			name: "Case #5",
 			operations: []models.Operation{
-				{"buy", 10.00, 10000},
-				{"buy", 25.00, 5000},
-				{"sell", 15.00, 10000},
-				{"sell", 25.00, 5000},
+				{Operation: "buy", UnitCost: 10.00, Quantity: 10000},
+				{Operation: "buy", UnitCost: 25.00, Quantity: 5000},
+				{Operation: "sell", UnitCost: 15.00, Quantity: 10000},
+				{Operation: "sell", UnitCost: 25.00, Quantity: 5000},
 			},
 			expected: []models.Tax{
 				{Tax: 0.00}, {Tax: 0.00}, {Tax: 0.00}, {Tax: 10000.00},
@@ -87,11 +87,11 @@ func TestCalculateCapitalGains(t *testing.T) {
 		{
 			name: "Case #6",
 			operations: []models.Operation{
-				{"buy", 10.00, 10000},
-				{"sell", 2.00, 5000},
-				{"sell", 20.00, 2000},
-				{"sell", 20.00, 2000},
-				{"sell", 25.00, 1000},
+				{Operation: "buy", UnitCost: 10.00, Quantity: 10000},
+				{Operation: "sell", UnitCost: 2.00, Quantity: 5000},
+				{Operation: "sell", UnitCost: 20.00, Quantity: 2000},
+				{Operation: "sell", UnitCost: 20.00, Quantity: 2000},
+				{Operation: "sell", UnitCost: 25.00, Quantity: 1000},
 			},
 			expected: []models.Tax{
 				{Tax: 0.00}, {Tax: 0.00}, {Tax: 0.00}, {Tax: 0.00}, {Tax: 3000.00},
@@ -100,15 +100,15 @@ func TestCalculateCapitalGains(t *testing.T) {
 		{
 			name: "Case #7",
 			operations: []models.Operation{
-				{"buy", 10.00, 10000},
-				{"sell", 2.00, 5000},
-				{"sell", 20.00, 2000},
-				{"sell", 20.00, 2000},
-				{"sell", 25.00, 1000},
-				{"buy", 20.00, 10000},
-				{"sell", 15.00, 5000},
-				{"sell", 30.00, 4350},
-				{"sell", 30.00, 650},
+				{Operation: "buy", UnitCost: 10.00, Quantity: 10000},
+				{Operation: "sell", UnitCost: 2.00, Quantity: 000},
+				{Operation: "sell", UnitCost: 20.00, Quantity: 2000},
+				{Operation: "sell", UnitCost: 20.00, Quantity: 2000},
+				{Operation: "sell", UnitCost: 25.00, Quantity: 1000},
+				{Operation: "buy", UnitCost: 20.00, Quantity: 10000},
+				{Operation: "sell", UnitCost: 15.00, Quantity: 5000},
+				{Operation: "sell", UnitCost: 30.00, Quantity: 4350},
+				{Operation: "sell", UnitCost: 30.00, Quantity: 650},
 			},
 			expected: []models.Tax{
 				{Tax: 0.00}, {Tax: 0.00}, {Tax: 0.00}, {Tax: 0.00}, {Tax: 3000.00},
@@ -118,10 +118,10 @@ func TestCalculateCapitalGains(t *testing.T) {
 		{
 			name: "Case #8",
 			operations: []models.Operation{
-				{"buy", 10.00, 10000},
-				{"sell", 50.00, 10000},
-				{"buy", 20.00, 10000},
-				{"sell", 50.00, 10000},
+				{Operation: "buy", UnitCost: 10.00, Quantity: 10000},
+				{Operation: "sell", UnitCost: 50.00, Quantity: 10000},
+				{Operation: "buy", UnitCost: 20.00, Quantity: 10000},
+				{Operation: "sell", UnitCost: 50.00, Quantity: 10000},
 			},
 			expected: []models.Tax{
 				{Tax: 0.00}, {Tax: 80000.00}, {Tax: 0.00}, {Tax: 60000.00},

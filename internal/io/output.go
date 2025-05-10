@@ -3,6 +3,7 @@ package io
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/rodrigodosanjosoliveira/capital-gains/internal/models"
 )
 

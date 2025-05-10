@@ -4,6 +4,8 @@ import (
 	"github.com/rodrigodosanjosoliveira/capital-gains/internal/models"
 )
 
+const taxExemptionLimit = 20000.0
+
 func CalculateCapitalGains(operations []models.Operation) []models.Tax {
 	var (
 		taxes           []models.Tax
@@ -15,11 +17,21 @@ func CalculateCapitalGains(operations []models.Operation) []models.Tax {
 	for _, op := range operations {
 		switch op.Operation {
 		case "buy":
-			weightedAverage, totalQuantity = updateWeightedAverage(weightedAverage, totalQuantity, op.UnitCost, op.Quantity)
+			weightedAverage, totalQuantity = updateWeightedAverage(
+				weightedAverage,
+				totalQuantity,
+				op.UnitCost,
+				op.Quantity,
+			)
 			taxes = append(taxes, models.Tax{Tax: 0.0})
 
 		case "sell":
-			tax, updatedQuantity, updatedLoss := handleSellOperation(op, weightedAverage, totalQuantity, accumulatedLoss)
+			tax, updatedQuantity, updatedLoss := handleSellOperation(
+				op,
+				weightedAverage,
+				totalQuantity,
+				accumulatedLoss,
+			)
 			taxes = append(taxes, models.Tax{Tax: tax})
 			totalQuantity = updatedQuantity
 			accumulatedLoss = updatedLoss
@@ -46,7 +58,7 @@ func handleSellOperation(
 	profit := saleValue - float64(op.Quantity)*weightedAverage
 	newQuantity := totalQuantity - op.Quantity
 
-	if saleValue <= 20000 {
+	if saleValue <= taxExemptionLimit {
 		if profit < 0 {
 			accumulatedLoss += -profit
 		}
@@ -58,7 +70,6 @@ func handleSellOperation(
 		return 0.0, newQuantity, accumulatedLoss
 	}
 
-	// lucro > 0
 	if accumulatedLoss > 0 {
 		if profit <= accumulatedLoss {
 			accumulatedLoss -= profit

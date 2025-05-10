@@ -31,7 +31,6 @@ func TestReadInputFlexible_FromStdin(t *testing.T) {
 	input := `[{"operation":"sell","unit-cost":15.0,"quantity":50}]`
 	r := strings.NewReader(input)
 
-	// Sem argumentos
 	originalArgs := os.Args
 	defer func() { os.Args = originalArgs }()
 	os.Args = []string{"cmd"}

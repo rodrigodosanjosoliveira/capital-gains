@@ -1,8 +1,9 @@
 package calculator
 
 import (
-	"github.com/rodrigodosanjosoliveira/capital-gains/internal/models"
 	"testing"
+
+	"github.com/rodrigodosanjosoliveira/capital-gains/internal/models"
 )
 
 func TestHandleSellOperation(t *testing.T) {
@@ -18,7 +19,7 @@ func TestHandleSellOperation(t *testing.T) {
 	}{
 		{
 			name:            "Sell below 20k is tax-free",
-			op:              models.Operation{"sell", 10.0, 1000},
+			op:              models.Operation{Operation: "sell", UnitCost: 10.0, Quantity: 1000},
 			weightedAvg:     5.0,
 			totalQty:        10000,
 			accumulatedLoss: 0,
@@ -38,7 +39,7 @@ func TestHandleSellOperation(t *testing.T) {
 		},
 		{
 			name:            "Profit absorbed by loss",
-			op:              models.Operation{"sell", 20.0, 1000},
+			op:              models.Operation{Operation: "sell", UnitCost: 20.0, Quantity: 1000},
 			weightedAvg:     10.0,
 			totalQty:        10000,
 			accumulatedLoss: 10000.0,
@@ -48,7 +49,7 @@ func TestHandleSellOperation(t *testing.T) {
 		},
 		{
 			name:            "Profit generates tax after loss used",
-			op:              models.Operation{"sell", 20.0, 1000},
+			op:              models.Operation{Operation: "sell", UnitCost: 20.0, Quantity: 1000},
 			weightedAvg:     10.0,
 			totalQty:        10000,
 			accumulatedLoss: 5000.0,
@@ -58,7 +59,7 @@ func TestHandleSellOperation(t *testing.T) {
 		},
 		{
 			name:            "Full profit tax when no loss",
-			op:              models.Operation{"sell", 30.0, 1000},
+			op:              models.Operation{Operation: "sell", UnitCost: 30.0, Quantity: 1000},
 			weightedAvg:     10.0,
 			totalQty:        10000,
 			accumulatedLoss: 0.0,
@@ -68,7 +69,7 @@ func TestHandleSellOperation(t *testing.T) {
 		},
 		{
 			name:            "Negative profit still adds loss",
-			op:              models.Operation{"sell", 8.0, 1000},
+			op:              models.Operation{Operation: "sell", UnitCost: 8.0, Quantity: 1000},
 			weightedAvg:     10.0,
 			totalQty:        10000,
 			accumulatedLoss: 200.0,
